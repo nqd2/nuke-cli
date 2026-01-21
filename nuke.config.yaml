@@ -11,7 +11,6 @@ targets:
   - .venv
   - venv
   - .parcel-cache
-  - .turbo
   - coverage
   - .nyc_output
 
@@ -29,9 +28,6 @@ ignore:
   - Program Files
   - Program Files (x86)
 
-# Cài đặt
 settings:
-  # Chiến lược xóa: "os-fast" (dùng robocopy) hoặc "native" (dùng filesystem API)
   strategy: os-fast
-  # Số luồng quét song song
   scan_threads: 8
