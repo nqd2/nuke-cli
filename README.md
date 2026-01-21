@@ -166,10 +166,12 @@ settings:
 ### Step 1: Prepare Environment
 
 1. **Install Visual Studio 2022:**
-   - Ensure you have "Desktop development with C++" installed to get the MSVC compiler and Windows SDK.
 
+   - Ensure you have "Desktop development with C++" installed to get the MSVC compiler and Windows SDK.
 2. **Install vcpkg:**
+
    - Install vcpkg in a root directory (e.g., `C:\vcpkg`) to avoid long path issues:
+
    ```powershell
    git clone https://github.com/microsoft/vcpkg.git C:\vcpkg
    cd C:\vcpkg
@@ -189,22 +191,24 @@ This is the most important step to ensure CLion recognizes the libraries from `v
 1. Go to **File** > **Settings** (or `Ctrl+Alt+S`).
 2. Navigate to **Build, Execution, Deployment** > **CMake**.
 3. In the **CMake options** field, add the following line to point to vcpkg's toolchain file:
+
    ```text
    -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
    ```
+
    > **Note:** Replace `C:/vcpkg` with your actual vcpkg installation path. Use forward slashes `/` instead of backslashes `\` to avoid errors.
-
+   >
 4. In the **Toolchain** section (above CMake options), ensure you have **Visual Studio** selected (not MinGW).
-   - If Visual Studio is not available, go to **Toolchains** (left sidebar), click the `+` button, and select Visual Studio. CLion will automatically detect your VS installation.
 
+   - If Visual Studio is not available, go to **Toolchains** (left sidebar), click the `+` button, and select Visual Studio. CLion will automatically detect your VS installation.
 5. **Build type:** Create a `Release` profile for optimal performance. Click the `+` button in the Profiles list to add `Release`.
 
 ### Step 4: Build the Project
 
 1. After configuration, click **OK** or **Apply**.
 2. Check the status bar at the bottom (CMake tab). CLion will start "Loading CMake project".
-   - At this point, vcpkg will automatically download and compile the libraries (`fmt`, `yaml-cpp`, `cli11`) based on `vcpkg.json`. This may take several minutes on the first run.
 
+   - At this point, vcpkg will automatically download and compile the libraries (`fmt`, `yaml-cpp`, `cli11`) based on `vcpkg.json`. This may take several minutes on the first run.
 3. Once CMake loads successfully (shows `[Finished]`), look at the top-right corner and select **nuke | Release** (or Debug) from the configuration dropdown.
 4. Click the Build icon (hammer) or press `Ctrl+F9`.
 
@@ -222,7 +226,7 @@ If you prefer building from the command line:
 
 ```powershell
 # Clone the repository
-git clone https://github.com/user/nuke-em.git
+git clone https://github.com/nqd2/nuke-em.git
 cd nuke-em
 
 # Configure and build
@@ -235,22 +239,23 @@ cmake --build build --config Release
 ### Troubleshooting
 
 - **`find_package` failed / Libraries not found:**
+
   - Verify the `-DCMAKE_TOOLCHAIN_FILE` path is correct.
   - Ensure `vcpkg.json` is in the same directory as `CMakeLists.txt`.
-
 - **`Windows.h` not found:**
-  - You're using MinGW or Cygwin toolchain. Go to **Settings** > **Build** > **Toolchains** and switch to **Visual Studio**.
 
+  - You're using MinGW or Cygwin toolchain. Go to **Settings** > **Build** > **Toolchains** and switch to **Visual Studio**.
 - **C++ Standard errors:**
+
   - `CMakeLists.txt` requires CMake 3.20+ and C++20. Ensure your Visual Studio is recent enough (VS 2019 v16.11+ or VS 2022).
 
 ### Dependencies
 
-| Package | Description |
-|---------|-------------|
-| [CLI11](https://github.com/CLIUtils/CLI11) | Command line parser |
-| [fmt](https://github.com/fmtlib/fmt) | Modern formatting library |
-| [yaml-cpp](https://github.com/jbeder/yaml-cpp) | YAML parser |
+| Package                                     | Description               |
+| ------------------------------------------- | ------------------------- |
+| [CLI11](https://github.com/CLIUtils/CLI11)     | Command line parser       |
+| [fmt](https://github.com/fmtlib/fmt)           | Modern formatting library |
+| [yaml-cpp](https://github.com/jbeder/yaml-cpp) | YAML parser               |
 
 ## 📁 Project Structure
 
@@ -278,13 +283,13 @@ nuke-em/
 
 ## 🎖️ Ranks
 
-| Rank | Threshold |
-|------|-----------|
-| 🥉 Noob | 0 GB |
-| 🧹 Janitor | 10 GB |
-| 🧽 Cleaner | 100 GB |
-| 💣 Demolition Man | 1 TB |
-| ☢️ Duke Nukem | 1+ TB |
+| Rank              | Threshold |
+| ----------------- | --------- |
+| 🥉 Noob           | 0 GB      |
+| 🧹 Janitor        | 10 GB     |
+| 🧽 Cleaner        | 100 GB    |
+| 💣 Demolition Man | 1 TB      |
+| ☢️ Duke Nukem   | 1+ TB     |
 
 ## ⚠️ Safety
 
