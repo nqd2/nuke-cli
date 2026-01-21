@@ -5,7 +5,6 @@ targets:
   - .next
   - .nuxt
   - dist
-  - build
   - .cache
   - target
   - __pycache__
@@ -17,6 +16,7 @@ targets:
   - .nyc_output
 
 ignore:
+  - build
   - bin
   - obj
   - .git

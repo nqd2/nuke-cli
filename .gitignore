@@ -20,3 +20,11 @@ vcpkg_installed/
 
 # Release zip file
 *.zip
+.zip/
+
+# Build
+
+build/
+
+# Scripts
+*.ps1
