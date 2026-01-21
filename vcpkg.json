@@ -1,0 +1,11 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "nuke-em",
+  "version": "1.0.0",
+  "description": "The nuclear option for project hygiene",
+  "dependencies": [
+    "cli11",
+    "fmt",
+    "yaml-cpp"
+  ]
+}
