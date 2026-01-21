@@ -17,7 +17,7 @@
   <img src="https://img.shields.io/badge/platform-Windows-blue?style=flat-square" alt="Platform">
   <img src="https://img.shields.io/badge/C%2B%2B-20-orange?style=flat-square" alt="C++20">
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License">
-  <img src="https://img.shields.io/badge/version-1.0.1-purple?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.0.2-purple?style=flat-square" alt="Version">
 </p>
 
 ---
