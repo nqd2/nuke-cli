@@ -155,31 +155,94 @@ settings:
 
 ### Requirements
 
-- Windows 10/11
-- Visual Studio 2022 (v143 toolset) or CLion
-- vcpkg
-- C++20
+- **Windows 10/11** (required - code uses Windows-specific APIs)
+- **Visual Studio 2022** (recommended) with "Desktop development with C++" workload
+- **CLion** (recommended IDE) or any CMake-compatible IDE
+- **vcpkg** (for dependency management)
+- **C++20** support
 
-### Setup
+> **⚠️ Important:** This project uses Windows-specific libraries (`<Windows.h>`, `<ShlObj.h>`) and system commands (`robocopy`). You **must build on Windows** using the **Visual Studio (MSVC)** toolchain, not MinGW.
 
-1. **Clone the repository:**
-   ```powershell
-   git clone https://github.com/user/nuke-em.git
-   cd nuke-em
-   ```
+### Step 1: Prepare Environment
 
-2. **Install vcpkg** (if not already):
+1. **Install Visual Studio 2022:**
+   - Ensure you have "Desktop development with C++" installed to get the MSVC compiler and Windows SDK.
+
+2. **Install vcpkg:**
+   - Install vcpkg in a root directory (e.g., `C:\vcpkg`) to avoid long path issues:
    ```powershell
    git clone https://github.com/microsoft/vcpkg.git C:\vcpkg
-   C:\vcpkg\bootstrap-vcpkg.bat
-   C:\vcpkg\vcpkg integrate install
+   cd C:\vcpkg
+   .\bootstrap-vcpkg.bat
    ```
 
-3. **Build with CMake:**
-   ```powershell
-   cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
-   cmake --build build --config Release
+### Step 2: Open Project in CLion
+
+1. Open CLion.
+2. Select **Open** and navigate to the `nuke-em` folder (the directory containing `CMakeLists.txt`).
+3. Select **Trust Project** if prompted.
+
+### Step 3: Configure CMake in CLion
+
+This is the most important step to ensure CLion recognizes the libraries from `vcpkg.json` (`cli11`, `fmt`, `yaml-cpp`).
+
+1. Go to **File** > **Settings** (or `Ctrl+Alt+S`).
+2. Navigate to **Build, Execution, Deployment** > **CMake**.
+3. In the **CMake options** field, add the following line to point to vcpkg's toolchain file:
+   ```text
+   -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
    ```
+   > **Note:** Replace `C:/vcpkg` with your actual vcpkg installation path. Use forward slashes `/` instead of backslashes `\` to avoid errors.
+
+4. In the **Toolchain** section (above CMake options), ensure you have **Visual Studio** selected (not MinGW).
+   - If Visual Studio is not available, go to **Toolchains** (left sidebar), click the `+` button, and select Visual Studio. CLion will automatically detect your VS installation.
+
+5. **Build type:** Create a `Release` profile for optimal performance. Click the `+` button in the Profiles list to add `Release`.
+
+### Step 4: Build the Project
+
+1. After configuration, click **OK** or **Apply**.
+2. Check the status bar at the bottom (CMake tab). CLion will start "Loading CMake project".
+   - At this point, vcpkg will automatically download and compile the libraries (`fmt`, `yaml-cpp`, `cli11`) based on `vcpkg.json`. This may take several minutes on the first run.
+
+3. Once CMake loads successfully (shows `[Finished]`), look at the top-right corner and select **nuke | Release** (or Debug) from the configuration dropdown.
+4. Click the Build icon (hammer) or press `Ctrl+F9`.
+
+### Step 5: Run/Test
+
+1. Since this is a CLI tool, clicking Run (green triangle) may cause the program to run and exit immediately or show help and exit.
+2. To test specific commands (e.g., `nuke list`), configure program arguments:
+   - Click the dropdown next to the Run button (where `nuke` is displayed), select **Edit Configurations...**
+   - In the **Program arguments** field, enter the arguments you want to test, e.g., `list` or `scout --root .`
+   - Click **OK** and then **Run**.
+
+### Alternative: Command Line Build
+
+If you prefer building from the command line:
+
+```powershell
+# Clone the repository
+git clone https://github.com/user/nuke-em.git
+cd nuke-em
+
+# Configure and build
+cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+cmake --build build --config Release
+
+# The executable will be in build/Release/nuke.exe (or build/nuke.exe depending on generator)
+```
+
+### Troubleshooting
+
+- **`find_package` failed / Libraries not found:**
+  - Verify the `-DCMAKE_TOOLCHAIN_FILE` path is correct.
+  - Ensure `vcpkg.json` is in the same directory as `CMakeLists.txt`.
+
+- **`Windows.h` not found:**
+  - You're using MinGW or Cygwin toolchain. Go to **Settings** > **Build** > **Toolchains** and switch to **Visual Studio**.
+
+- **C++ Standard errors:**
+  - `CMakeLists.txt` requires CMake 3.20+ and C++20. Ensure your Visual Studio is recent enough (VS 2019 v16.11+ or VS 2022).
 
 ### Dependencies
 
