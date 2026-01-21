@@ -1,0 +1,82 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*' # Chỉ chạy khi push tag bắt đầu bằng 'v' (vd: v1.0.0)
+
+permissions:
+  contents: write # Cần quyền để tạo Release
+
+env:
+  BUILD_TYPE: Release
+  # Thư mục build (GitHub Actions không dùng "cmake-build-release-visual-studio" mặc định)
+  BUILD_DIR: build 
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Setup vcpkg (Tận dụng cache để build nhanh hơn)
+      - name: Setup vcpkg
+        uses: actions/github-script@v7
+        with:
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+
+      - name: Configure CMake
+        # Sử dụng toolchain file của vcpkg có sẵn trên máy ảo GitHub
+        run: >
+          cmake -B ${{ env.BUILD_DIR }}
+          -DCMAKE_BUILD_TYPE=${{ env.BUILD_DIR }}
+          -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+        env:
+          VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
+
+      - name: Build
+        run: cmake --build ${{ env.BUILD_DIR }} --config ${{ env.BUILD_TYPE }}
+
+      # --- BẮT ĐẦU ĐOẠN SCRIPT ĐÓNG GÓI (Giống logic PS1 của bạn) ---
+      - name: Package Release
+        shell: pwsh
+        run: |
+          # 1. Tạo thư mục tạm để gom file
+          $StagingDir = "staging"
+          New-Item -ItemType Directory -Path $StagingDir -Force | Out-Null
+          
+          # Đường dẫn file sau khi build xong (Thường nằm trong Release)
+          $BinDir = "${{ env.BUILD_DIR }}\Release"
+          
+          # 2. Copy các file Binary (.exe, .dll)
+          # Lưu ý: vcpkg trên Windows thường tự copy DLL vào thư mục output, nên ta copy từ đó
+          Copy-Item -Path "$BinDir\nuke.exe" -Destination $StagingDir -ErrorAction Stop
+          
+          # Kiểm tra và copy DLL nếu tồn tại (như script cũ của bạn)
+          if (Test-Path "$BinDir\fmt.dll") { Copy-Item "$BinDir\fmt.dll" $StagingDir }
+          if (Test-Path "$BinDir\yaml-cpp.dll") { Copy-Item "$BinDir\yaml-cpp.dll" $StagingDir }
+          
+          # 3. Copy các file Config & License từ thư mục gốc
+          Copy-Item "nuke.config.yaml" $StagingDir -ErrorAction SilentlyContinue
+          Copy-Item "README.md" $StagingDir -ErrorAction SilentlyContinue
+          Copy-Item "LICENSE" $StagingDir -ErrorAction SilentlyContinue
+          
+          # 4. Nén thành file ZIP
+          $ZipName = "nuke-${{ github.ref_name }}-win64.zip"
+          Compress-Archive -Path "$StagingDir\*" -DestinationPath $ZipName
+          
+          # Lưu tên file vào biến môi trường để bước sau dùng
+          echo "RELEASE_ZIP_PATH=$ZipName" >> $env:GITHUB_ENV
+
+      # --- TẠO RELEASE TRÊN GITHUB ---
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ env.RELEASE_ZIP_PATH }}
+          generate_release_notes: true
+          draft: false
+          prerelease: false
